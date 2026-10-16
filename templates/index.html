@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="RevenueLeak AI detects preventable revenue leakage and turns it into recovery action.">
+    <title>RevenueLeak AI — Revenue Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --page: #c9d0d8;
+            --navy: #061525;
+            --navy-2: #08192b;
+            --panel: #0b1c2e;
+            --panel-2: #102238;
+            --line: #203247;
+            --line-soft: #14283b;
+            --text: #f5f7fb;
+            --muted: #91a1b7;
+            --blue: #3887ff;
+            --blue-2: #236ee8;
+            --violet: #7547d8;
+        }
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            margin: 0;
+            color: var(--text);
+            background: var(--page);
+            font-family: "Inter", system-ui, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        a { color: inherit; text-decoration: none; }
+        button { font: inherit; }
+        .site-shell {
+            width: 100%;
+            min-height: 100vh;
+            overflow: hidden;
+            border: 6px solid #bac3cd;
+            border-radius: 22px;
+            background: var(--navy);
+            box-shadow: 0 20px 60px rgba(11, 24, 40, .18);
+        }
+        .nav {
+            height: 68px;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            gap: 20px;
+            padding: 0 28px;
+            border-bottom: 1px solid var(--line-soft);
+            background: #071424;
+        }
+        .brand {
+            font-family: "Plus Jakarta Sans", sans-serif;
+            font-size: 21px;
+            font-weight: 800;
+            letter-spacing: -.045em;
+        }
+        .nav-links { display: flex; align-items: center; gap: 30px; }
+        .nav-links a { color: #9aa9bc; font-size: 12px; transition: color .18s ease; }
+        .nav-links a:hover { color: #fff; }
+        .nav-tools { display: flex; justify-content: flex-end; align-items: center; gap: 16px; }
+        .nav-icon {
+            width: 30px;
+            height: 30px;
+            display: grid;
+            place-items: center;
+            color: #a9b7c8;
+            border-radius: 7px;
+            transition: background .18s ease, color .18s ease;
+        }
+        .nav-icon:hover { color: #fff; background: #11243a; }
+        .nav-icon svg { width: 18px; height: 18px; stroke: currentColor; }
+        .avatar { width: 30px; height: 30px; object-fit: cover; border: 2px solid #8190a1; border-radius: 50%; }
+
+        .hero {
+            width: min(1320px, calc(100% - 56px));
+            min-height: 610px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: .94fr 1.06fr;
+            align-items: center;
+            gap: 80px;
+            padding: 72px 0 78px;
+        }
+        .hero-copy { max-width: 590px; }
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 28px;
+            padding: 5px 9px;
+            color: #9eacc0;
+            border: 1px solid #617087;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        .seal {
+            width: 15px;
+            height: 15px;
+            display: grid;
+            place-items: center;
+            color: #9dc2ff;
+            border: 1px solid #7394c3;
+            border-radius: 50%;
+            font-size: 8px;
+        }
+        h1 {
+            max-width: 590px;
+            margin: 0;
+            font-family: "Plus Jakarta Sans", sans-serif;
+            font-size: clamp(46px, 5.2vw, 70px);
+            line-height: 1.08;
+            letter-spacing: -.06em;
+        }
+        .hero-copy > p {
+            max-width: 570px;
+            margin: 26px 0 0;
+            color: var(--muted);
+            font-size: 15px;
+            line-height: 1.65;
+        }
+        .hero-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 34px; }
+        .button {
+            min-height: 48px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            padding: 0 24px;
+            color: #fff;
+            border: 1px solid #2f80f7;
+            border-radius: 6px;
+            background: var(--blue);
+            font-size: 13px;
+            font-weight: 700;
+            box-shadow: 0 9px 24px rgba(35,110,232,.2);
+            transition: transform .18s ease, background .18s ease;
+        }
+        .button:hover { transform: translateY(-1px); background: var(--blue-2); }
+        .button-outline { border-color: #263a51; background: transparent; box-shadow: none; }
+        .button-outline:hover { background: #102238; }
+        .play {
+            width: 18px;
+            height: 18px;
+            display: grid;
+            place-items: center;
+            border: 1px solid #adbac9;
+            border-radius: 50%;
+            font-size: 8px;
+        }
+
+        .analytics-panel {
+            min-height: 450px;
+            padding: 50px 58px;
+            border: 1px solid #2a3d54;
+            border-radius: 11px;
+            background: linear-gradient(145deg, #071524, #09192a);
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,.01), 0 25px 55px rgba(0,0,0,.12);
+        }
+        .mock-kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+        .kpi-card {
+            height: 82px;
+            padding: 16px;
+            border-radius: 7px;
+            background: #15273b;
+        }
+        .kpi-label { width: 44%; height: 7px; margin-bottom: 18px; border-radius: 99px; background: #273a50; }
+        .gradient-bar { width: 72%; height: 27px; border-radius: 3px; background: linear-gradient(90deg, #2458a8, var(--violet)); }
+        .bar-row { height: 27px; display: flex; align-items: flex-end; gap: 5px; }
+        .bar-row i { display: block; flex: 1; border-radius: 2px 2px 0 0; background: #2a3c52; }
+        .bar-row i:nth-child(1) { height: 9px; }
+        .bar-row i:nth-child(2) { height: 17px; }
+        .bar-row i:nth-child(3) { height: 27px; background: #2d73d8; }
+        .bar-row i:nth-child(4) { height: 12px; }
+        .chart-card {
+            height: 245px;
+            padding: 24px 18px 13px;
+            border-radius: 7px;
+            background: #15273b;
+        }
+        .chart-card svg { width: 100%; height: 100%; overflow: visible; }
+        .chart-grid { stroke: #1e334a; stroke-width: 1; opacity: .55; }
+        .chart-area { fill: url(#areaFill); opacity: .32; }
+        .chart-line { fill: none; stroke: #357ff0; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+        .chart-point { fill: #5598ff; filter: drop-shadow(0 0 5px rgba(73,142,255,.8)); }
+
+        .trusted {
+            padding: 27px 28px 29px;
+            border-top: 1px solid var(--line-soft);
+            border-bottom: 1px solid var(--line-soft);
+            text-align: center;
+            background: #061525;
+        }
+        .trusted small { color: #63758b; text-transform: uppercase; letter-spacing: .13em; font-size: 9px; font-weight: 700; }
+        .logo-row { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 75px; margin-top: 20px; }
+        .logo-row span { color: #8391a3; font-family: "Plus Jakarta Sans", sans-serif; font-size: 19px; font-weight: 700; letter-spacing: -.04em; }
+
+        .intelligence {
+            max-width: 870px;
+            margin: 0 auto;
+            padding: 78px 28px 68px;
+            text-align: center;
+        }
+        .intelligence h2, .features-title h2 {
+            margin: 0;
+            font-family: "Plus Jakarta Sans", sans-serif;
+            font-size: 32px;
+            letter-spacing: -.04em;
+        }
+        .intelligence p, .features-title p {
+            margin: 18px auto 0;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.65;
+        }
+        .features { padding: 10px 28px 80px; border-top: 1px solid var(--line-soft); }
+        .features-inner { width: min(1200px, 100%); margin: 0 auto; }
+        .features-title { max-width: 630px; padding: 65px 0 35px; }
+        .feature-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        .feature-card { padding: 24px; border: 1px solid #26384d; border-radius: 9px; background: #0a1a2c; }
+        .feature-icon { width: 38px; height: 38px; display: grid; place-items: center; margin-bottom: 28px; color: #75aaff; border-radius: 7px; background: #122a46; font-weight: 800; }
+        .feature-card h3 { margin: 0 0 10px; font-size: 15px; }
+        .feature-card p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+        .footer { display: flex; justify-content: space-between; gap: 20px; padding: 28px; color: #6f8197; border-top: 1px solid var(--line-soft); font-size: 11px; }
+
+        @media (max-width: 980px) {
+            .nav { grid-template-columns: 1fr auto; }
+            .nav-links { display: none; }
+            .hero { grid-template-columns: 1fr; gap: 55px; }
+            .hero-copy { max-width: 680px; }
+            .analytics-panel { min-height: 400px; }
+            .feature-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 620px) {
+            .site-shell { border-width: 3px; border-radius: 14px; }
+            .nav { height: 62px; padding: 0 16px; }
+            .brand { font-size: 17px; }
+            .nav-icon { display: none; }
+            .hero { width: calc(100% - 32px); padding: 52px 0; }
+            h1 { font-size: 44px; }
+            .hero-copy > p { font-size: 14px; }
+            .hero-actions .button { width: 100%; }
+            .analytics-panel { min-height: 310px; padding: 25px; }
+            .kpi-card { height: 64px; padding: 11px; }
+            .kpi-label { margin-bottom: 11px; }
+            .gradient-bar, .bar-row { height: 20px; }
+            .chart-card { height: 185px; }
+            .logo-row { gap: 26px; }
+            .logo-row span { font-size: 15px; }
+            .feature-grid { grid-template-columns: 1fr; }
+            .footer { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="site-shell">
+        <nav class="nav">
+            <a class="brand" href="{{ url_for('home') }}">RevenueLeak AI</a>
+            <div class="nav-links">
+                <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('transaction_list') }}">Transactions</a>
+                <a href="{{ url_for('alert_list') }}">Alerts</a>
+                <a href="#intelligence">Reports</a>
+            </div>
+            <div class="nav-tools">
+                {% if current_user %}
+                <a class="nav-icon" href="{{ url_for('alert_list') }}" aria-label="Alerts">
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </a>
+                <a class="nav-icon" href="{{ url_for('dashboard') }}" aria-label="Dashboard settings">
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4ZM19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.12 2.12-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.04 1.55V20.3h-3v-.09a1.7 1.7 0 0 0-1.04-1.55 1.7 1.7 0 0 0-1.88.34l-.06.06-2.12-2.12.06-.06A1.7 1.7 0 0 0 7 15a1.7 1.7 0 0 0-1.55-1.04H5.3v-3h.15A1.7 1.7 0 0 0 7 9.92a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.12-2.12.06.06a1.7 1.7 0 0 0 1.88.34A1.7 1.7 0 0 0 11.7 4.7V4.6h3v.1a1.7 1.7 0 0 0 1.04 1.56 1.7 1.7 0 0 0 1.88-.34l.06-.06 2.12 2.12-.06.06a1.7 1.7 0 0 0-.34 1.88 1.7 1.7 0 0 0 1.55 1.04h.15v3h-.15A1.7 1.7 0 0 0 19.4 15Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </a>
+                <a href="{{ url_for('profile') }}"><img class="avatar" src="{{ url_for('static', filename='images/user-profile.jpg') }}" alt="Profile"></a>
+                {% else %}
+                <a class="button button-outline" href="{{ url_for('login') }}">Sign in</a>
+                <a class="button" href="{{ url_for('register') }}">Create account</a>
+                {% endif %}
+            </div>
+        </nav>
+
+        <main>
+            <section class="hero">
+                <div class="hero-copy">
+                    <div class="eyebrow"><span class="seal">✓</span>Enterprise Grade Accuracy</div>
+                    <h1>Stopping Revenue Leakage before it happens.</h1>
+                    <p>Deploy AI-driven auditing and predictive analytics to identify uncaptured revenue streams, resolve anomalies, and fortify your financial operations in real time.</p>
+                    <div class="hero-actions">
+                        {% if current_user %}
+                        <a class="button" href="{{ url_for('dashboard') }}">Open Dashboard</a>
+                        <a class="button button-outline" href="{{ url_for('add_transaction') }}"><span class="play">▶</span>Add Transaction</a>
+                        {% else %}
+                        <a class="button" href="{{ url_for('register') }}">Create Account</a>
+                        <a class="button button-outline" href="{{ url_for('login') }}"><span class="play">▶</span>Sign In</a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="analytics-panel" aria-label="Revenue analytics illustration">
+                    <div class="mock-kpis">
+                        <div class="kpi-card"><div class="kpi-label"></div><div class="gradient-bar"></div></div>
+                        <div class="kpi-card"><div class="kpi-label"></div><div class="bar-row"><i></i><i></i><i></i><i></i></div></div>
+                    </div>
+                    <div class="chart-card">
+                        <svg viewBox="0 0 520 210" role="img" aria-label="Upward revenue trend">
+                            <defs>
+                                <linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#387fff"/><stop offset="1" stop-color="#387fff" stop-opacity="0"/></linearGradient>
+                            </defs>
+                            <path class="chart-grid" d="M0 45H520M0 100H520M0 155H520"/>
+                            <path class="chart-area" d="M0 176 C60 110 105 135 145 150 C195 169 216 65 267 73 C326 82 326 187 383 161 C418 145 424 17 470 18 C500 19 507 83 520 91 L520 210 L0 210Z"/>
+                            <path class="chart-line" d="M0 176 C60 110 105 135 145 150 C195 169 216 65 267 73 C326 82 326 187 383 161 C418 145 424 17 470 18 C500 19 507 83 520 91"/>
+                            <circle class="chart-point" cx="428" cy="103" r="6"/>
+                        </svg>
+                    </div>
+                </div>
+            </section>
+
+            <section class="trusted">
+                <small>Built for modern financial teams</small>
+                <div class="logo-row"><span>Billing</span><span>Revenue Operations</span><span>Finance</span><span>Collections</span></div>
+            </section>
+
+            <section class="intelligence" id="intelligence">
+                <h2>AI-Powered Revenue Intelligence</h2>
+                <p>Our detection engine continuously evaluates transaction data, identifies subtle anomalies and systemic pricing errors, and explains which recovery actions should come first.</p>
+            </section>
+
+            <section class="features">
+                <div class="features-inner">
+                    <div class="features-title"><h2>Built to detect, explain, and recover.</h2><p>A practical revenue-protection workflow connected to your Flask and MySQL application.</p></div>
+                    <div class="feature-grid">
+                        <article class="feature-card"><div class="feature-icon">01</div><h3>Automated auditing</h3><p>Evaluate every stored transaction using consistent detection rules.</p></article>
+                        <article class="feature-card"><div class="feature-icon">02</div><h3>Leak detection</h3><p>Find underbilling, overdue payments, and excessive discounts.</p></article>
+                        <article class="feature-card"><div class="feature-icon">03</div><h3>Risk scoring</h3><p>Prioritize alerts by severity, probability, and estimated loss.</p></article>
+                        <article class="feature-card"><div class="feature-icon">04</div><h3>Recovery workflow</h3><p>Track each alert through review, confirmation, and recovery.</p></article>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer"><strong>RevenueLeak AI</strong><span>Portfolio revenue recovery platform · Flask + MySQL</span></footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Analytics · RevenueLeak AI{% endblock %}
+{% block content %}
+<section class="app-page"><div class="container">
+    <div class="page-header"><div><span class="section-kicker">Performance intelligence</span><h1>Revenue analytics</h1><p>Measure exposure, collection performance and recovery effectiveness.</p></div><a class="button button-secondary" href="{{ url_for('reports') }}">Create report</a></div>
+    <div class="metric-grid">
+        <article class="metric-card metric-red"><div class="metric-top"><span>Detected exposure</span><span class="metric-icon">◎</span></div><strong>{{ detected_loss|money }}</strong><small>All valid detected signals</small></article>
+        <article class="metric-card metric-amber"><div class="metric-top"><span>Open exposure</span><span class="metric-icon">!</span></div><strong>{{ open_loss|money }}</strong><small>Still requires action</small></article>
+        <article class="metric-card metric-blue"><div class="metric-top"><span>Recovered revenue</span><span class="metric-icon">↗</span></div><strong>{{ recovered_total|money }}</strong><small>Verified recovery value</small></article>
+        <article class="metric-card metric-violet"><div class="metric-top"><span>Recovery rate</span><span class="metric-icon">%</span></div><strong>{{ '%.1f'|format(recovery_rate) }}%</strong><small>Recovered ÷ detected exposure</small></article>
+    </div>
+    <div class="analytics-grid">
+        <section class="panel chart-panel">
+            <div class="panel-header"><div><h2>Expected vs collected</h2><p>Last six calendar months</p></div><div class="chart-legend"><span class="expected-dot">Expected</span><span class="collected-dot">Collected</span></div></div>
+            <div class="bar-chart">{% for month in monthly %}<div class="bar-row-chart"><span>{{ month.label }}</span><div class="bar-track"><i class="bar-expected" style="width: {{ month.expected_width }}%"></i><i class="bar-collected" style="width: {{ month.collected_width }}%"></i></div><strong>{{ month.collected|money }}</strong></div>{% endfor %}</div>
+        </section>
+        <section class="panel chart-panel">
+            <div class="panel-header"><div><h2>Leakage by signal</h2><p>Estimated value by detector output</p></div></div>
+            {% if leak_types %}<div class="category-chart">{% for item in leak_types %}<div><header><span>{{ item.label }}</span><strong>{{ item.value|money }}</strong></header><div class="category-track"><i style="width: {{ item.width }}%"></i></div></div>{% endfor %}</div>{% else %}<div class="empty-state compact"><span>◎</span><h3>No scan data</h3><p>Run the AI scan to populate analytics.</p></div>{% endif %}
+        </section>
+    </div>
+    <section class="panel severity-panel">
+        <div class="panel-header"><div><h2>Severity distribution</h2><p>Current alert portfolio</p></div></div>
+        <div class="severity-grid">{% for label in ['Critical', 'High', 'Medium', 'Low'] %}<div><span class="badge badge-{{ label|lower }}">{{ label }}</span><strong>{{ severity_counts.get(label, 0) }}</strong><small>alerts</small></div>{% endfor %}</div>
+    </section>
+</div></section>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Sign in · RevenueLeak AI{% endblock %}
+{% block content %}
+<section class="auth-page">
+    <div class="auth-shell">
+        <div class="auth-copy">
+            <span class="section-kicker">Secure workspace</span>
+            <h1>Revenue recovery starts with the right signal.</h1>
+            <p>Sign in to monitor leakage, explain anomaly scores, and track recovered revenue.</p>
+            <div class="auth-feature"><span>AI</span><div><strong>Explainable hybrid detection</strong><small>Rules plus unsupervised peer analysis</small></div></div>
+            <div class="auth-feature"><span>₹</span><div><strong>Recovery management</strong><small>Owners, deadlines, actions and recovered value</small></div></div>
+        </div>
+        <form class="panel auth-card" method="post">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+            <span class="section-kicker">Account access</span>
+            <h2>Sign in</h2>
+            <p>Use your RevenueLeak AI account.</p>
+            <label>Email address<input type="email" name="email" autocomplete="email" required value="{{ request.form.get('email', '') }}" placeholder="you@company.com"></label>
+            <label>Password<input type="password" name="password" autocomplete="current-password" required placeholder="Enter your password"></label>
+            <button class="button button-block" type="submit">Open workspace →</button>
+            <p class="auth-switch">New authorized user? <a href="{{ url_for('register') }}">Create an account</a></p>
+            <div class="credential-note"><strong>First login</strong><code>admin@revenueleak.ai</code><code>Admin@123</code><small>Change this password from Profile after signing in.</small></div>
+        </form>
+    </div>
+</section>
+{% endblock %}

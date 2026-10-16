@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} · RevenueLeak AI{% endblock %}
+
+{% block content %}
+<section class="app-page">
+    <div class="container narrow-container">
+        <div class="page-header">
+            <div>
+                <a class="back-link" href="{{ url_for('transaction_list') }}">← Transactions</a>
+                <h1>{{ page_title }}</h1>
+                <p>Enter the contract, billing, and payment values used by the detector.</p>
+            </div>
+        </div>
+
+        <form class="panel form-panel" method="post">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+            <div class="form-section-heading">
+                <span>01</span><div><h2>Transaction details</h2><p>Basic reference information for this revenue record.</p></div>
+            </div>
+            <div class="form-grid">
+                <label>Transaction code
+                    <input name="transaction_code" required placeholder="TXN-1001" value="{{ request.form.get('transaction_code', transaction.transaction_code or '') }}">
+                </label>
+                <label>Customer name
+                    <input name="customer_name" required placeholder="Acme Industries" value="{{ request.form.get('customer_name', transaction.customer_name or '') }}">
+                </label>
+                <label>Transaction date
+                    <input type="date" name="transaction_date" required value="{{ request.form.get('transaction_date', transaction.transaction_date.isoformat() if transaction.transaction_date else '') }}">
+                </label>
+                <label>Due date
+                    <input type="date" name="due_date" value="{{ request.form.get('due_date', transaction.due_date.isoformat() if transaction.due_date else '') }}">
+                </label>
+            </div>
+
+            <div class="form-divider"></div>
+            <div class="form-section-heading">
+                <span>02</span><div><h2>Revenue values</h2><p>These values power the leakage detection rules.</p></div>
+            </div>
+            <div class="form-grid three-columns">
+                <label>Expected amount (₹)
+                    <input type="number" step="0.01" min="0" name="expected_amount" required value="{{ request.form.get('expected_amount', transaction.expected_amount or 0) }}">
+                </label>
+                <label>Billed amount (₹)
+                    <input type="number" step="0.01" min="0" name="billed_amount" required value="{{ request.form.get('billed_amount', transaction.billed_amount or 0) }}">
+                </label>
+                <label>Paid amount (₹)
+                    <input type="number" step="0.01" min="0" name="paid_amount" required value="{{ request.form.get('paid_amount', transaction.paid_amount or 0) }}">
+                </label>
+                <label>Discount (%)
+                    <input type="number" step="0.01" min="0" max="100" name="discount_percent" required value="{{ request.form.get('discount_percent', transaction.discount_percent or 0) }}">
+                </label>
+                <label>Payment status
+                    {% set selected_status = request.form.get('payment_status', transaction.payment_status or 'Pending') %}
+                    <select name="payment_status">
+                        {% for status in ['Pending', 'Partially Paid', 'Paid', 'Overdue', 'Refunded'] %}
+                            <option value="{{ status }}" {{ 'selected' if selected_status == status else '' }}>{{ status }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" name="service_active" {{ 'checked' if request.form.get('service_active') == 'on' or (not request.form and transaction.service_active) else '' }}>
+                    <span><strong>Service active</strong><small>Customer is still receiving service.</small></span>
+                </label>
+            </div>
+
+            <div class="form-actions">
+                <a class="button button-secondary" href="{{ url_for('transaction_list') }}">Cancel</a>
+                <button class="button" type="submit">{{ submit_label }} →</button>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

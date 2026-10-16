@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Import transactions · RevenueLeak AI{% endblock %}
+
+{% block content %}
+<section class="app-page">
+    <div class="container narrow-container">
+        <div class="page-header">
+            <div>
+                <a class="back-link" href="{{ url_for('transaction_list') }}">← Transactions</a>
+                <span class="section-kicker">Bulk data</span>
+                <h1>Import transactions</h1>
+                <p>Upload up to 5,000 transactions from a UTF-8 CSV file.</p>
+            </div>
+            <a class="button button-secondary" href="{{ url_for('transaction_csv_template') }}">Download CSV template</a>
+        </div>
+
+        {% if errors %}
+        <section class="import-errors" aria-live="polite">
+            <h2>Fix these issues</h2>
+            <ul>{% for error in errors %}<li>{{ error }}</li>{% endfor %}</ul>
+        </section>
+        {% endif %}
+
+        <form class="panel form-panel upload-panel" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+            <div class="form-section-heading">
+                <span>01</span>
+                <div><h2>Select your CSV file</h2><p>The complete import is cancelled if any row contains an error.</p></div>
+            </div>
+
+            <label class="upload-dropzone">
+                <input type="file" name="csv_file" accept=".csv,text/csv" required>
+                <span class="upload-icon">⇧</span>
+                <strong>Choose a CSV file</strong>
+                <small>Maximum file size: 5 MB</small>
+            </label>
+
+            <div class="form-divider"></div>
+            <div class="form-section-heading">
+                <span>02</span>
+                <div><h2>Required columns</h2><p>Keep these exact column names in the first row.</p></div>
+            </div>
+            <div class="column-list">
+                {% for header in csv_headers %}<code>{{ header }}</code>{% endfor %}
+            </div>
+
+            <div class="import-notes">
+                <h3>Formatting rules</h3>
+                <ul>
+                    <li>Dates must use <code>YYYY-MM-DD</code>.</li>
+                    <li>Payment status must be Pending, Partially Paid, Paid, Overdue, or Refunded.</li>
+                    <li>Service active must be <code>yes</code> or <code>no</code>.</li>
+                    <li>Transaction codes must be unique.</li>
+                </ul>
+            </div>
+
+            <div class="form-actions">
+                <a class="button button-secondary" href="{{ url_for('transaction_list') }}">Cancel</a>
+                <button class="button" type="submit">Validate and import →</button>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Reports · RevenueLeak AI{% endblock %}
+{% block content %}
+<section class="app-page"><div class="container">
+    <div class="page-header"><div><span class="section-kicker">Audit-ready reporting</span><h1>Leakage reports</h1><p>Filter the signal register and export the exact results to CSV.</p></div><a class="button" href="{{ url_for('report_export', **request.args) }}">Export report CSV ↓</a></div>
+    <form class="filter-bar report-filters" method="get">
+        <label><span>Search</span><input name="q" placeholder="Customer, code or signal" value="{{ request.args.get('q', '') }}"></label>
+        <label><span>Status</span><select name="status"><option value="">All statuses</option>{% for status in alert_statuses %}<option value="{{ status }}" {{ 'selected' if request.args.get('status') == status else '' }}>{{ status }}</option>{% endfor %}</select></label>
+        <label><span>Severity</span><select name="severity"><option value="">All severities</option>{% for severity in ['Critical', 'High', 'Medium', 'Low'] %}<option value="{{ severity }}" {{ 'selected' if request.args.get('severity') == severity else '' }}>{{ severity }}</option>{% endfor %}</select></label>
+        <label><span>Signal type</span><select name="type"><option value="">All types</option>{% for leak_type in leak_types %}<option value="{{ leak_type }}" {{ 'selected' if request.args.get('type') == leak_type else '' }}>{{ leak_type }}</option>{% endfor %}</select></label>
+        <label><span>From</span><input type="date" name="date_from" value="{{ request.args.get('date_from', '') }}"></label><label><span>To</span><input type="date" name="date_to" value="{{ request.args.get('date_to', '') }}"></label>
+        <button class="button button-small" type="submit">Generate report</button><a class="filter-clear" href="{{ url_for('reports') }}">Clear</a>
+    </form>
+    <div class="report-summary"><div><span>Matching signals</span><strong>{{ alerts|length }}</strong></div><div><span>Filtered exposure</span><strong>{{ filtered_loss|money }}</strong></div><div><span>Recovered value</span><strong>{{ filtered_recovered|money }}</strong></div></div>
+    <section class="panel"><div class="panel-header"><div><h2>Signal register</h2><p>Generated from the current filters</p></div></div>
+        {% if alerts %}<div class="table-wrap"><table><thead><tr><th>Transaction</th><th>Signal</th><th>Severity</th><th>Risk</th><th>Exposure</th><th>Alert status</th><th>Recovery</th><th>Recovered</th></tr></thead><tbody>
+        {% for alert in alerts %}<tr><td><strong>{{ alert.transaction.transaction_code }}</strong><small>{{ alert.transaction.customer_name }}</small></td><td>{{ alert.leak_type }}</td><td><span class="badge badge-{{ alert.severity|lower }}">{{ alert.severity }}</span></td><td>{{ alert.risk_score }}/100</td><td>{{ alert.estimated_loss|money }}</td><td><span class="status-label">{{ alert.status }}</span></td><td>{{ alert.recovery.status if alert.recovery else 'Not planned' }}</td><td>{{ alert.recovery.recovered_amount|money if alert.recovery else '₹0.00' }}</td></tr>{% endfor %}
+        </tbody></table></div>{% else %}<div class="empty-state"><span>⌕</span><h3>No report results</h3><p>Change the filters or run the AI scan.</p></div>{% endif %}
+    </section>
+</div></section>
+{% endblock %}

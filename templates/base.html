@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="RevenueLeak AI monitors billing and payment data for preventable revenue leakage.">
+    <title>{% block title %}RevenueLeak AI{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="app-body">
+<div class="app-frame">
+    <header class="site-header">
+        <div class="nav-shell">
+            <a class="brand" href="{{ url_for('home') }}" aria-label="RevenueLeak AI home">RevenueLeak AI</a>
+
+            {% if current_user %}
+            <nav class="main-nav" aria-label="Main navigation">
+                <a class="{{ 'active' if request.endpoint == 'dashboard' else '' }}" href="{{ url_for('dashboard') }}">Dashboard</a>
+                <a class="{{ 'active' if request.endpoint in ['transaction_list', 'add_transaction', 'edit_transaction', 'import_transactions'] else '' }}" href="{{ url_for('transaction_list') }}">Transactions</a>
+                <a class="{{ 'active' if request.endpoint in ['alert_list', 'manage_recovery'] else '' }}" href="{{ url_for('alert_list') }}">Alerts</a>
+                <a class="{{ 'active' if request.endpoint == 'recovery_list' else '' }}" href="{{ url_for('recovery_list') }}">Recoveries</a>
+                <a class="{{ 'active' if request.endpoint == 'analytics' else '' }}" href="{{ url_for('analytics') }}">Analytics</a>
+                <a class="{{ 'active' if request.endpoint == 'reports' else '' }}" href="{{ url_for('reports') }}">Reports</a>
+            </nav>
+
+            <div class="nav-tools">
+                <a class="nav-icon" href="{{ url_for('alert_list') }}" aria-label="Alerts">
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </a>
+                {% if current_user.role == 'Admin' %}<a class="nav-icon" href="{{ url_for('user_list') }}" aria-label="Team settings">
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4ZM19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.12 2.12-.06-.06a1.7 1.7 0 0 0-1.88-.34A1.7 1.7 0 0 0 14.7 20.2v.1h-3v-.1a1.7 1.7 0 0 0-1.04-1.55 1.7 1.7 0 0 0-1.88.34l-.06.06-2.12-2.12.06-.06A1.7 1.7 0 0 0 7 15a1.7 1.7 0 0 0-1.55-1.04H5.3v-3h.15A1.7 1.7 0 0 0 7 9.92a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.12-2.12.06.06a1.7 1.7 0 0 0 1.88.34A1.7 1.7 0 0 0 11.7 4.7V4.6h3v.1a1.7 1.7 0 0 0 1.04 1.56 1.7 1.7 0 0 0 1.88-.34l.06-.06 2.12 2.12-.06.06a1.7 1.7 0 0 0-.34 1.88 1.7 1.7 0 0 0 1.55 1.04h.15v3h-.15A1.7 1.7 0 0 0 19.4 15Z" stroke="currentColor" stroke-width="1.4"/></svg>
+                </a>{% endif %}
+                <a class="profile-chip" href="{{ url_for('profile') }}" title="Open profile">
+                    <img class="nav-avatar" src="{{ url_for('static', filename='images/user-profile.jpg') }}" alt="">
+                    <span><strong>{{ current_user.name }}</strong><small>{{ current_user.role }}</small></span>
+                </a>
+                <form action="{{ url_for('logout') }}" method="post">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+                    <button class="logout-button" type="submit">Sign out</button>
+                </form>
+            </div>
+            {% else %}
+            <div></div>
+            <div class="nav-tools"><a class="nav-text-link" href="{{ url_for('register') }}">Create account</a><a class="button button-small" href="{{ url_for('login') }}">Sign in</a></div>
+            {% endif %}
+        </div>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="container flash-stack" aria-live="polite">
+                {% for category, message in messages %}
+                    <div class="flash flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <main>{% block content %}{% endblock %}</main>
+
+    <footer class="site-footer">
+        <div class="footer-row">
+            <div><a class="brand brand-footer" href="{{ url_for('home') }}">RevenueLeak AI</a></div>
+            <p>Portfolio project · Flask + MySQL + explainable hybrid AI</p>
+        </div>
+    </footer>
+</div>
+</body>
+</html>

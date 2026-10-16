@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Recoveries · RevenueLeak AI{% endblock %}
+{% block content %}
+<section class="app-page"><div class="container">
+    <div class="page-header"><div><span class="section-kicker">Action workspace</span><h1>Revenue recoveries</h1><p>Track owners, deadlines, progress and money recovered.</p></div><a class="button button-secondary" href="{{ url_for('reports') }}">Open reports</a></div>
+    <form class="filter-bar" method="get">
+        <label><span>Search</span><input name="q" placeholder="Code or customer" value="{{ request.args.get('q', '') }}"></label>
+        <label><span>Status</span><select name="status"><option value="">All statuses</option>{% for status in recovery_statuses %}<option value="{{ status }}" {{ 'selected' if request.args.get('status') == status else '' }}>{{ status }}</option>{% endfor %}</select></label>
+        <label><span>Owner</span><select name="owner"><option value="">All owners</option>{% for user in users %}<option value="{{ user.id }}" {{ 'selected' if request.args.get('owner') == user.id|string else '' }}>{{ user.name }}</option>{% endfor %}</select></label>
+        <button class="button button-small" type="submit">Apply filters</button><a class="filter-clear" href="{{ url_for('recovery_list') }}">Clear</a>
+    </form>
+    <section class="panel">
+        <div class="panel-header"><div><h2>Recovery pipeline</h2><p>{{ recoveries|length }} matching case{{ '' if recoveries|length == 1 else 's' }}</p></div></div>
+        {% if recoveries %}<div class="table-wrap"><table>
+            <thead><tr><th>Transaction</th><th>Signal</th><th>Action</th><th>Owner</th><th>Priority</th><th>Status</th><th>Target</th><th>Recovered</th>{% if current_user.role in ['Admin', 'Analyst'] %}<th></th>{% endif %}</tr></thead>
+            <tbody>{% for recovery in recoveries %}<tr>
+                <td><strong>{{ recovery.alert.transaction.transaction_code }}</strong><small>{{ recovery.alert.transaction.customer_name }}</small></td>
+                <td>{{ recovery.alert.leak_type }}<small>{{ recovery.alert.estimated_loss|money }} opportunity</small></td>
+                <td>{{ recovery.action_type }}</td><td>{{ recovery.owner.name if recovery.owner else 'Unassigned' }}</td>
+                <td><span class="badge badge-{{ recovery.priority|lower }}">{{ recovery.priority }}</span></td><td><span class="status-label">{{ recovery.status }}</span></td>
+                <td>{{ recovery.target_date.strftime('%d %b %Y') if recovery.target_date else '—' }}</td><td>{{ recovery.recovered_amount|money }}</td>
+                {% if current_user.role in ['Admin', 'Analyst'] %}<td><a class="icon-button" href="{{ url_for('manage_recovery', alert_id=recovery.alert_id) }}">Update</a></td>{% endif %}
+            </tr>{% endfor %}</tbody>
+        </table></div>{% else %}<div class="empty-state"><span>↗</span><h3>No recovery cases yet</h3><p>Open an alert and create its recovery plan.</p><a class="button" href="{{ url_for('alert_list') }}">View alerts</a></div>{% endif %}
+    </section>
+</div></section>
+{% endblock %}

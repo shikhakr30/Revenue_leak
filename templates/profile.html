@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Profile · RevenueLeak AI{% endblock %}
+{% block content %}
+<section class="app-page"><div class="container narrow-container">
+    <div class="page-header"><div><span class="section-kicker">Account</span><h1>Your profile</h1><p>Update your identity, organization or password.</p></div></div>
+    <form class="panel form-panel" method="post">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+        <div class="profile-summary"><img src="{{ url_for('static', filename='images/user-profile.jpg') }}" alt=""><div><strong>{{ current_user.name }}</strong><span>{{ current_user.email }}</span><small>{{ current_user.company or 'Organization not set' }} · {{ current_user.role }} access</small></div></div>
+        <div class="form-divider"></div>
+        <div class="form-grid">
+            <label>Display name<input name="name" required value="{{ request.form.get('name', current_user.name) }}"></label>
+            <label>Company<input name="company" required value="{{ request.form.get('company', current_user.company) }}"></label>
+            <label>New password <small>Leave blank to keep the current password.</small><input type="password" name="password" minlength="8" autocomplete="new-password"></label>
+        </div>
+        <div class="form-actions"><a class="button button-secondary" href="{{ url_for('dashboard') }}">Cancel</a><button class="button" type="submit">Save profile</button></div>
+    </form>
+</div></section>
+{% endblock %}

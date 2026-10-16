@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard · RevenueLeak AI{% endblock %}
+
+{% block content %}
+<section class="app-page">
+    <div class="container">
+        <div class="page-header">
+            <div>
+                <span class="section-kicker">Revenue operations</span>
+                <h1>Revenue dashboard</h1>
+                <p>Monitor AI signals and move the most valuable recovery actions first.</p>
+            </div>
+            {% if current_user.role in ['Admin', 'Analyst'] %}
+            <div class="page-actions">
+                <a class="button button-secondary" href="{{ url_for('add_transaction') }}">Add transaction</a>
+                <form action="{{ url_for('run_scan') }}" method="post">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+                    <button class="button" type="submit">Run AI scan <span aria-hidden="true">↗</span></button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="metric-grid">
+            {% for stat in stats %}
+            <article class="metric-card metric-{{ stat.tone }}">
+                <div class="metric-top"><span>{{ stat.label }}</span><span class="metric-icon">{{ '↗' if stat.tone == 'blue' else '◎' }}</span></div>
+                <strong>{{ stat.value }}</strong>
+                <small>{{ 'Requires review or action' if stat.label == 'Open Alerts' else 'Live database value' }}</small>
+            </article>
+            {% endfor %}
+        </div>
+
+        <div class="content-grid">
+            <section class="panel panel-wide" id="latest-signals">
+                <div class="panel-header">
+                    <div><h2>Latest detection signals</h2><p>Hybrid rules and peer-anomaly results.</p></div>
+                    <a class="text-link" href="{{ url_for('alert_list') }}">View all alerts →</a>
+                </div>
+                {% if recent_alerts %}
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Signal</th><th>Transaction</th><th>Severity</th><th>Risk</th><th>Loss</th><th>Status</th></tr></thead>
+                        <tbody>
+                            {% for alert in recent_alerts %}
+                            <tr>
+                                <td><strong>{{ alert.leak_type }}</strong><small>{{ alert.detected_at.strftime('%d %b %Y, %H:%M') }}</small></td>
+                                <td><strong>{{ alert.transaction.transaction_code }}</strong><small>{{ alert.transaction.customer_name }}</small></td>
+                                <td><span class="badge badge-{{ alert.severity|lower }}">{{ alert.severity }}</span></td>
+                                <td>{{ alert.risk_score }}/100</td>
+                                <td>{{ alert.estimated_loss|money }}</td>
+                                <td><span class="status-label">{{ alert.status }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-state compact">
+                    <span>◎</span><h3>No signals yet</h3><p>Add transaction data, then run the AI scan.</p>
+                </div>
+                {% endif %}
+            </section>
+
+            <aside class="panel action-panel">
+                <div class="action-icon">AI</div>
+                <h2>Hybrid intelligence</h2>
+                <p>Known leakage rules are combined with a robust unsupervised model that compares each record with peer transaction behaviour.</p>
+                <a class="button button-block" href="{{ url_for('analytics') }}">Explore analytics</a>
+                <div class="action-note"><span>●</span> Explainable · Local · No paid API</div>
+            </aside>
+        </div>
+
+        <section class="panel dashboard-section">
+            <div class="panel-header">
+                <div><h2>Priority recovery queue</h2><p>{{ priority_recoveries|length }} active case{{ '' if priority_recoveries|length == 1 else 's' }} · {{ transaction_count }} transactions monitored</p></div>
+                <a class="text-link" href="{{ url_for('recovery_list') }}">Open recovery workspace →</a>
+            </div>
+            {% if priority_recoveries %}
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Transaction</th><th>Signal</th><th>Priority</th><th>Owner</th><th>Target</th><th>Recovered</th></tr></thead>
+                    <tbody>{% for recovery in priority_recoveries %}
+                        <tr>
+                            <td><strong>{{ recovery.alert.transaction.transaction_code }}</strong><small>{{ recovery.alert.transaction.customer_name }}</small></td>
+                            <td>{{ recovery.alert.leak_type }}</td>
+                            <td><span class="badge badge-{{ recovery.priority|lower }}">{{ recovery.priority }}</span></td>
+                            <td>{{ recovery.owner.name if recovery.owner else 'Unassigned' }}</td>
+                            <td>{{ recovery.target_date.strftime('%d %b %Y') if recovery.target_date else '—' }}</td>
+                            <td>{{ recovery.recovered_amount|money }}</td>
+                        </tr>
+                    {% endfor %}</tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state compact"><span>✓</span><h3>No active recovery cases</h3><p>Create a recovery plan from any alert.</p></div>
+            {% endif %}
+        </section>
+
+        {% if current_user.role == 'Admin' and transaction_count == 0 %}
+        <section class="demo-banner">
+            <div><strong>Portfolio demo mode</strong><p>Load realistic sample transactions and AI alerts with one click.</p></div>
+            <form action="{{ url_for('seed_demo_data') }}" method="post">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+                <button class="button" type="submit">Load demo data</button>
+            </form>
+        </section>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

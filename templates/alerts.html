@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Alerts · RevenueLeak AI{% endblock %}
+
+{% block content %}
+<section class="app-page">
+    <div class="container">
+        <div class="page-header">
+            <div><span class="section-kicker">Explainable intelligence</span><h1>Leakage alerts</h1><p>Understand every signal, validate it, and create a recovery plan.</p></div>
+            {% if current_user.role in ['Admin', 'Analyst'] %}
+            <form action="{{ url_for('run_scan') }}" method="post">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+                <input type="hidden" name="next" value="{{ url_for('alert_list') }}">
+                <button class="button" type="submit">Run AI scan ↗</button>
+            </form>
+            {% endif %}
+        </div>
+
+        <form class="filter-bar" method="get">
+            <label><span>Search</span><input name="q" placeholder="Customer, code or signal" value="{{ request.args.get('q', '') }}"></label>
+            <label><span>Status</span><select name="status"><option value="">All statuses</option>{% for status in alert_statuses %}<option value="{{ status }}" {{ 'selected' if request.args.get('status') == status else '' }}>{{ status }}</option>{% endfor %}</select></label>
+            <label><span>Severity</span><select name="severity"><option value="">All severities</option>{% for severity in ['Critical', 'High', 'Medium', 'Low'] %}<option value="{{ severity }}" {{ 'selected' if request.args.get('severity') == severity else '' }}>{{ severity }}</option>{% endfor %}</select></label>
+            <label><span>Signal type</span><select name="type"><option value="">All signal types</option>{% for leak_type in leak_types %}<option value="{{ leak_type }}" {{ 'selected' if request.args.get('type') == leak_type else '' }}>{{ leak_type }}</option>{% endfor %}</select></label>
+            <button class="button button-small" type="submit">Apply filters</button>
+            <a class="filter-clear" href="{{ url_for('alert_list') }}">Clear</a>
+        </form>
+
+        <section class="panel">
+            <div class="panel-header"><div><h2>Detection results</h2><p>{{ alerts|length }} matching alert{{ '' if alerts|length == 1 else 's' }}</p></div><a class="text-link" href="{{ url_for('reports') }}">Build report →</a></div>
+            {% if alerts %}
+            <div class="alert-list">
+                {% for alert in alerts %}
+                <article class="alert-card">
+                    <div class="alert-main">
+                        <div class="alert-title-row">
+                            <span class="badge badge-{{ alert.severity|lower }}">{{ alert.severity }}</span>
+                            <span class="risk-score">Risk {{ alert.risk_score }}/100</span>
+                            <span class="engine-tag">{{ 'AI model' if alert.leak_type == 'AI Anomaly' else 'Rule engine' }}</span>
+                        </div>
+                        <h3>{{ alert.leak_type }}</h3>
+                        <p>{{ alert.explanation }}</p>
+                        <div class="alert-meta">
+                            <span><strong>{{ alert.transaction.transaction_code }}</strong> · {{ alert.transaction.customer_name }}</span>
+                            <span>Detected {{ alert.detected_at.strftime('%d %b %Y, %H:%M') }}</span>
+                            {% if alert.recovery %}<span>Recovery: <strong>{{ alert.recovery.status }}</strong></span>{% endif %}
+                        </div>
+                    </div>
+                    <div class="alert-value">
+                        <small>Estimated loss</small>
+                        <strong>{{ alert.estimated_loss|money }}</strong>
+                        {% if current_user.role in ['Admin', 'Analyst'] %}
+                        <a class="button button-small button-block" href="{{ url_for('manage_recovery', alert_id=alert.id) }}">{{ 'Update recovery' if alert.recovery else 'Create recovery plan' }}</a>
+                        <form action="{{ url_for('update_alert_status', alert_id=alert.id) }}" method="post">
+                            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+                            <input type="hidden" name="next" value="{{ request.full_path }}">
+                            <select name="status" aria-label="Update alert status">
+                                {% for status in alert_statuses %}<option value="{{ status }}" {{ 'selected' if alert.status == status else '' }}>{{ status }}</option>{% endfor %}
+                            </select>
+                            <button class="button button-secondary button-small button-block" type="submit">Update status</button>
+                        </form>
+                        {% else %}<span class="status-label">{{ alert.status }}</span>{% endif %}
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state"><span>✓</span><h3>No alerts found</h3><p>Change the filters or run a scan after adding transaction data.</p></div>
+            {% endif %}
+        </section>
+    </div>
+</section>
+{% endblock %}

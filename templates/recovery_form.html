@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Recovery plan · RevenueLeak AI{% endblock %}
+{% block content %}
+<section class="app-page"><div class="container narrow-container">
+    <div class="page-header"><div><a class="back-link" href="{{ url_for('alert_list') }}">← Alerts</a><span class="section-kicker">Revenue recovery</span><h1>{{ 'Update' if recovery else 'Create' }} recovery plan</h1><p>Turn the detected signal into an accountable action.</p></div></div>
+    <section class="signal-summary">
+        <div><span class="badge badge-{{ alert.severity|lower }}">{{ alert.severity }}</span><h2>{{ alert.leak_type }}</h2><p>{{ alert.explanation }}</p><small>{{ alert.transaction.transaction_code }} · {{ alert.transaction.customer_name }}</small></div>
+        <div><small>Estimated opportunity</small><strong>{{ alert.estimated_loss|money }}</strong><span>Risk {{ alert.risk_score }}/100</span></div>
+    </section>
+    <form class="panel form-panel" method="post">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+        <div class="form-section-heading"><span>01</span><div><h2>Recovery action</h2><p>Assign ownership and choose the next step.</p></div></div>
+        <div class="form-grid three-columns">
+            {% set selected_action = request.form.get('action_type', recovery.action_type if recovery else 'Review invoice') %}
+            <label>Action<select name="action_type">{% for action in recovery_actions %}<option value="{{ action }}" {{ 'selected' if selected_action == action else '' }}>{{ action }}</option>{% endfor %}</select></label>
+            {% set selected_owner = request.form.get('owner_id', recovery.owner_id if recovery else '')|string %}
+            <label>Owner<select name="owner_id"><option value="">Unassigned</option>{% for user in users %}<option value="{{ user.id }}" {{ 'selected' if selected_owner == user.id|string else '' }}>{{ user.name }} · {{ user.role }}</option>{% endfor %}</select></label>
+            {% set selected_priority = request.form.get('priority', recovery.priority if recovery else alert.severity) %}
+            <label>Priority<select name="priority">{% for priority in recovery_priorities %}<option value="{{ priority }}" {{ 'selected' if selected_priority == priority else '' }}>{{ priority }}</option>{% endfor %}</select></label>
+        </div>
+        <div class="form-divider"></div>
+        <div class="form-section-heading"><span>02</span><div><h2>Progress and value</h2><p>Record the deadline, current state and actual recovery.</p></div></div>
+        <div class="form-grid three-columns">
+            {% set selected_status = request.form.get('status', recovery.status if recovery else 'Planned') %}
+            <label>Status<select name="status">{% for status in recovery_statuses %}<option value="{{ status }}" {{ 'selected' if selected_status == status else '' }}>{{ status }}</option>{% endfor %}</select></label>
+            <label>Target date<input type="date" name="target_date" value="{{ request.form.get('target_date', recovery.target_date.isoformat() if recovery and recovery.target_date else '') }}"></label>
+            <label>Recovered amount (₹)<input type="number" min="0" max="{{ alert.estimated_loss }}" step="0.01" name="recovered_amount" value="{{ request.form.get('recovered_amount', recovery.recovered_amount if recovery else 0) }}"></label>
+        </div>
+        <label class="textarea-label">Notes<textarea name="notes" rows="6" placeholder="Record contact attempts, invoice corrections and next steps...">{{ request.form.get('notes', recovery.notes if recovery else '') }}</textarea></label>
+        <div class="form-actions"><a class="button button-secondary" href="{{ url_for('alert_list') }}">Cancel</a><button class="button" type="submit">Save recovery plan →</button></div>
+    </form>
+</div></section>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Create account · RevenueLeak AI{% endblock %}
+{% block content %}
+<section class="auth-page">
+    <div class="auth-shell">
+        <div class="auth-copy">
+            <span class="section-kicker">Authorized access</span>
+            <h1>Join your revenue intelligence workspace.</h1>
+            <p>Create an account request for your organization. Financial data remains protected until an administrator approves access.</p>
+            <div class="auth-feature"><span>1</span><div><strong>Create your account</strong><small>Enter your identity, company and secure password</small></div></div>
+            <div class="auth-feature"><span>2</span><div><strong>Administrator approval</strong><small>A workspace administrator verifies and assigns your role</small></div></div>
+            <div class="auth-feature"><span>3</span><div><strong>Access the workspace</strong><small>Approved users can sign in with their assigned permissions</small></div></div>
+        </div>
+        <form class="panel auth-card" method="post">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+            <span class="section-kicker">New account</span>
+            <h2>Create account</h2>
+            <p>Your request will be sent for administrator approval.</p>
+            <label>Full name<input name="name" autocomplete="name" required value="{{ request.form.get('name', '') }}" placeholder="Your name"></label>
+            <label>Company<input name="company" autocomplete="organization" required value="{{ request.form.get('company', '') }}" placeholder="Company name"></label>
+            <label>Email address<input type="email" name="email" autocomplete="email" required value="{{ request.form.get('email', '') }}" placeholder="you@company.com"></label>
+            <label>Password<input type="password" name="password" autocomplete="new-password" minlength="8" required placeholder="At least 8 characters"></label>
+            <label>Confirm password<input type="password" name="confirm_password" autocomplete="new-password" minlength="8" required placeholder="Enter password again"></label>
+            <button class="button button-block" type="submit">Request access →</button>
+            <p class="auth-switch">Already approved? <a href="{{ url_for('login') }}">Sign in</a></p>
+        </form>
+    </div>
+</section>
+{% endblock %}
